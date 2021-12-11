@@ -64,8 +64,4 @@ contract DCX918Market {
 
         emit itemSold(id, msg.sender,itemsForSale[id].askingPrice);
     }
-
-
-
-
 }
