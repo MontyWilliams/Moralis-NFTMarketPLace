@@ -44,6 +44,7 @@ onItemSold = async (item) => {
           const userItemListing = document.getElementById(`user-item-${item.tokenObjectId}`);
           if (userItemListing) userItemListing.parentNode.removeChild(userItemListing);       
       }
+      
   }
 }
 
@@ -56,7 +57,7 @@ onItemAdded = async (item) => {
             if (user.get('accounts').includes(addedItem.ownerOf)){
                  const userItemListing = document.getElementById(`user-item-${item.tokenObjectId}`);
                  if (userItemListing) userItemListing.parentNode.removeChild(userItemListing);
-
+ 
                 getAndRenderItemData(addedItem, renderUserItem);
                 return;
             }
@@ -244,8 +245,8 @@ loadItems = async () => {
           }
       }
       getAndRenderItemData(item, renderItem);
-    })
-    console.log(items);
+    });
+    // console.log(items);
 }
 
 initTemplate = (id) => {
@@ -255,7 +256,7 @@ initTemplate = (id) => {
   return template;
 }
 
-renderUserItem = (item) => {
+renderUserItem = async (item) => {
   const userItemListing = document.getElementById(`user-item-${item.tokenObjectId}`);
   if (userItemListing) return;
 
@@ -264,10 +265,24 @@ renderUserItem = (item) => {
   userItem.getElementsByTagName("img")[0].alt = item.name;
   userItem.getElementsByTagName("h5")[0].innerText = item.name;
   userItem.getElementsByTagName("p")[0].innerText = item.description;
-  userItem.Id = `user-item-${item.tokenObjectId}`
-  userItems.appendChild(userItem);
 
+  userItem.getElementsByTagName("input")[0].value = item.askingPrice ?? 1;
+  userItem.getElementsByTagName("input")[0].disabled = item.askingPrice > 0;
+  userItem.getElementsByTagName("button")[0].disabled = item.askingPrice > 0;
+  userItem.getElementsByTagName("button")[0].onclick = async () => {
+      user = await Moralis.User.current();
+      if (!user){
+          login();
+          return;
+      }
+      await ensureMarketplaceIsApproved(item.tokenId, item.tokenAddress);
+      await marketplaceContract.methods.addItemToMarket(item.tokenId, item.tokenAddress, userItem.getElementsByTagName("input")[0].value).send({from: user.get('ethAddress') });
+  };
+
+  userItem.id = `user-item-${item.tokenObjectId}`
+  userItems.appendChild(userItem);
 }
+
 
 renderItem = (item) => {
   const itemForSale = marketplaceItemTemplate.cloneNode(true);
