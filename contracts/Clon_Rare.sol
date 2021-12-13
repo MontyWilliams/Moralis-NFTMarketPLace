@@ -3,12 +3,13 @@ pragma solidity ^0.8.10;
 
 import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-contract DCX918 is ERC721 {
+contract DCX918 is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-     constructor() ERC721("DCX918", "918X"){}
+     constructor() ERC721 ("DCX918", "918X"){}
 
      struct Item {
          uint256 id;

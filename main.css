@@ -1,0 +1,133 @@
+#background-video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+#myVideo {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+  }
+.bg-moralis{
+    background: #b7e803!important;
+}
+.text-moralis{
+    color: #b7e803!important;
+}
+.border-moralis{
+    border-color: #b7e803!important;
+}
+.btn-moralis{
+    color: #f2f2f2!important;
+    background: #b7e803!important;
+}
+.btn-moralis:hover{
+    color: #f2f2f2!important;
+    background: #729103!important;
+}
+
+.btn-outline-moralis{
+    color: #b7e803!important;
+    border: 1px solid #b7e803!important;
+}
+.btn-outline-moralis:hover{
+    color: #f2f2f2!important;
+    background: #729103!important;
+}
+
+.btn-primary{
+    background: #0C2E75 !important;
+    border-color: #0C2E75 !important;
+    color: #f2f2f2;
+}
+.btn-primary:hover{
+    background: #082151 !important;
+    border-color: #082151 !important;
+    color: #f2f2f2;
+}
+
+.card {
+    border-radius: .6rem !important;
+    background: transparent;
+    color: white;
+}
+
+/* .border-light {
+    border-color: rgb(61, 61, 61) !important;
+} */
+
+.card2 {
+    max-width: 250px;
+    padding: 2px;
+    position: relative;
+    z-index:1;
+    background: transparent;
+    background-image: linear-gradient(83deg, transparent 0%, #f3f3e146 46%, hsla(39, 100%, 72%, 0.275) 100%); 
+    margin-right:25px;
+    filter: brightness(120%);
+  }
+  
+  .card2:before {
+    z-index:-1;
+    background: transparent;
+    position: absolute;
+    content:"";
+    width:230px;
+    height:230px;
+    left:10px;
+    top:0;
+    background-image: linear-gradient(43deg, transparent 0%, #c8c65079 46%, #ffcd7028 100%); 
+    filter: blur(20px);  
+  }
+  
+  .gradient {
+    background-color: #0b090a;
+    padding: 30px;
+    color: white; 
+    font-size: 35px;
+    font-family: arial;
+    text-align: center;
+  }
+
+  .background-video{
+      z-index: -1000;
+  }
+
+  .modal-header{
+      background: transparent;
+  }
+
+  .modal fade{
+    background: transparent;
+}
+
+.modal-body{
+    background: rgba(0, 0, 0, 0.864);
+}
+
+.card3 {
+    background: rgb(255, 255, 255);
+    width: 50%;
+    height: 80%;
+    border-radius: 5%;
+    box-shadow:
+      inset 0 0 50px rgba(255, 255, 255, 0.412),      /* inner white */
+      inset 20px 0 80px rgba(255, 225, 0, 0.2),   /* inner left magenta short */
+      inset -20px 0 80px rgb(226, 242, 242),  /* inner right cyan short */
+      inset 20px 0 300px rgb(7, 5, 5),  /* inner left magenta broad */
+      inset -20px 0 300px rgba(0, 0, 0, 0.857), /* inner right cyan broad */
+      0 0 50px #fff,            /* outer white */
+      -10px 0 80px rgba(255, 0, 255, 0.371),        /* outer left magenta */
+      10px 0 80px rgba(0, 255, 255, 0.707);         /* outer right cyan */
+  }
+  .card-img-top{
+      border-radius: 50%;
+  }

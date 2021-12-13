@@ -1,27 +1,22 @@
-
-
 const serverUrl = "https://5afgk9nae19l.usemoralis.com:2053/server";
 const appId = "lhSPMJb08k6pB25ESY87s7VxvnNZobzHLWHbs8yj";
 Moralis.start({ serverUrl, appId });
 
-const TOKEN_CONTRACT_ADDRESS = "0x9Fa3ee20B8238f0e7b4ccC27Be91d50380E8D268";
-const MARKETPLACE_CONTRACT_ADDRESS = "0x1073E8266785015098b3A0eb047A767f5B80C205";
-
+const TOKEN_CONTRACT_ADDRESS = "0x4159e7056192d775B44a8f69C78663747Ce0DE52";
+const MARKETPLACE_CONTRACT_ADDRESS = "0xBA5272ABCa33AC6F7331eBEd0abd7fD75d231Ae1";
 
 init = async () => {
   hideElement(userItemsSection);
-  hideElement(userInfo);
-  hideElement(createItemForm);
-  window.web3 = await Moralis.enableWeb3();
+  window.web3 = await Moralis.Web3.enable();
   window.tokenContract = new web3.eth.Contract(tokenContractAbi, TOKEN_CONTRACT_ADDRESS);
   window.marketplaceContract = new web3.eth.Contract(marketplaceContractAbi, MARKETPLACE_CONTRACT_ADDRESS);
   initUser();
-   loadItems(); 
-  
+  loadItems();
+
   const soldItemsQuery = new Moralis.Query('SoldItems');
   const soldItemsSubscription = await soldItemsQuery.subscribe();
   soldItemsSubscription.on("create", onItemSold);
-  
+
   const itemsAddedQuery = new Moralis.Query('ItemsForSale');
   const itemsAddedSubscription = await itemsAddedQuery.subscribe();
   itemsAddedSubscription.on("create", onItemAdded);
@@ -41,53 +36,48 @@ onItemSold = async (item) => {
           if (user.get('accounts').includes(item.attributes.buyer)){
               getAndRenderItemData(soldItem, renderUserItem);
           }
+
           const userItemListing = document.getElementById(`user-item-${item.tokenObjectId}`);
-          if (userItemListing) userItemListing.parentNode.removeChild(userItemListing);       
+          if (userItemListing) userItemListing.parentNode.removeChild(userItemListing);
+        
       }
-      
+ 
   }
 }
 
 onItemAdded = async (item) => {
-    const params = {uid: `${item.attributes.uid}`};
-    const addedItem = await Moralis.Cloud.run('getItem', params);
-    if (addedItem){
-        user = await Moralis.User.current();
-        if (user){
-            if (user.get('accounts').includes(addedItem.ownerOf)){
-                 const userItemListing = document.getElementById(`user-item-${item.tokenObjectId}`);
-                 if (userItemListing) userItemListing.parentNode.removeChild(userItemListing);
- 
-                getAndRenderItemData(addedItem, renderUserItem);
-                return;
-            }
-        }
-        getAndRenderItemData(addedItem, renderItem);
-    }
+  const params = {uid: `${item.attributes.uid}`};
+  const addedItem = await Moralis.Cloud.run('getItem', params);
+  if (addedItem){
+      user = await Moralis.User.current();
+      if (user){
+          if (user.get('accounts').includes(addedItem.ownerOf)){
+              const userItemListing = document.getElementById(`user-item-${item.tokenObjectId}`);
+              if (userItemListing) userItemListing.parentNode.removeChild(userItemListing);
+
+              getAndRenderItemData(addedItem, renderUserItem);
+              return;
+          }
+      }
+      getAndRenderItemData(addedItem, renderItem);
+  }
 
 }
 
 initUser = async () => {
-  if (await Moralis.User.current())
-  {
-    window.web3 = await Moralis.enableWeb3();
-    window.tokenContract = new web3.eth.Contract(tokenContractAbi, TOKEN_CONTRACT_ADDRESS);
-    hideElement(userConnectButton);
-    showElement(userProfileButton);
-    showElement(openCreateItemButton);
-    showElement(openUserItemsButton);
-    loadUserItems();
+  if (await Moralis.User.current()){
+      hideElement(userConnectButton);
+      showElement(userProfileButton);
+      showElement(openCreateItemButton);
+      showElement(openUserItemsButton);
+      loadUserItems();
+  }else{
+      showElement(userConnectButton);
+      hideElement(userProfileButton);
+      hideElement(openCreateItemButton);
+      hideElement(openUserItemsButton);
   }
-  else
-  {
-    showElement(userConnectButton);
-    hideElement(userProfileButton);
-    hideElement(openCreateItemButton);
-    hideElement(openUserItemsButton);
-  } 
 }
-
-//  initUser();
 
 login = async () => {
   try {
@@ -98,7 +88,7 @@ login = async () => {
   }
 }
 
-logOut = async ()  =>{
+logout = async () => {
   await Moralis.User.logOut();
   hideElement(userInfo);
   initUser();
@@ -106,105 +96,86 @@ logOut = async ()  =>{
 
 openUserInfo = async () => {
   user = await Moralis.User.current();
-  //console.log(user);
-  if (user)
-  {
-    const email = user.get('email');
-    if(email){
-      userEmailField.value = email;
-    }else{
-      userUsernameField.value = "";
-    }
-    userUsernameField.value = user.get('username');
-    
-    const userAvatar = user.get('avatar');
-    if(userAvatar){
-      userAvatarImg.src = userAvatar.url();
-      showElement(userAvatarImg)
-    } else{
-      hideElement(userAvatarImg);
-    }
-    showElement(userInfo);
-  }
-  else
-  {
-    login();
+  if (user){    
+      const email = user.get('email');
+      if(email){
+          userEmailField.value = email;
+      }else{
+          userEmailField.value = "";
+      }
+
+      userUsernameField.value = user.get('username');
+
+      const userAvatar = user.get('avatar');
+      if(userAvatar){
+          userAvatarImg.src = userAvatar.url();
+          showElement(userAvatarImg);
+      }else{
+          hideElement(userAvatarImg);
+      }
+
+      $('#userInfo').modal('show');
+  }else{
+      login();
   }
 }
 
 saveUserInfo = async () => {
   user.set('email', userEmailField.value);
   user.set('username', userUsernameField.value);
-  
-  if (userAvatarFile.files.length > 0){
-    // Moralis can handle any kind of file but her we specify jpegS
-    const avatar = new Moralis.File("avatar.jpg", userAvatarFile.files[0]);
-    //dont worry about name colisions theyr given names and track by element Id
-    user.set('avatar', avatar);
+
+  if (userAvatarFile.files.length > 0) {
+      const avatar = new Moralis.File("avatar1.jpg", userAvatarFile.files[0]);
+      user.set('avatar', avatar);
   }
+
   await user.save();
-  alert("We got your info stored!");
+  alert("User info saved successfully!");
   openUserInfo();
 }
 
-
 createItem = async () => {
+
   if (createItemFile.files.length == 0){
-    alert("Are you gonna select a file?");
-    return;
+      alert("Please select a file!");
+      return;
   } else if (createItemNameField.value.length == 0){
-    alert("You need to give the file a name!");
-    return;
+      alert("Please give the item a name!");
+      return;
   }
-  
-  const nftFile = new Moralis.File("nftFile",createItemFile.files[0]);
+
+  const nftFile = new Moralis.File("nftFile.jpg",createItemFile.files[0]);
   await nftFile.saveIPFS();
-  
+
   const nftFilePath = nftFile.ipfs();
-  const nftFileHash = nftFile.hash();
-  
+
   const metadata = {
-    name: createItemNameField.value,
-    description: createItemDescriptionField.value,
-    image: nftFilePath,
+      name: createItemNameField.value,
+      description: createItemDescriptionField.value,
+      image: nftFilePath,
   };
-  
- const nftFileMetadataFile = new Moralis.File("metadata.json", {base64: btoa(JSON.stringify(metadata))});
- await nftFileMetadataFile.saveIPFS();
-var nftFileMetadataFilePath = nftFileMetadataFile.ipfs();
-var nftFileMetadataFileHash = nftFileMetadataFile.hash();
 
- const nftId = await mintNft(nftFileMetadataFilePath);
- 
- const Item = Moralis.Object.extend("Item");
- //create new instance of the class
- const item = new Item(); 
- item.set('name', createItemNameField.value);
- item.set('description', createItemDescriptionField.value);
- item.set('nftFilePath', nftFilePath);
- item.set('nftFileHash', nftFileHash);
- item.set('nftFileMetadataFilePath', nftFileMetadataFilePath);
- item.set('MetadataFileHash', nftFileMetadataFileHash);
- item.set('nftId', nftId);
- item.set('nftContractAddress', TOKEN_CONTRACT_ADDRESS);
- await item.save();
- console.log(item);
+  const nftFileMetadataFile = new Moralis.File("metadata.json", {base64 : btoa(JSON.stringify(metadata))});
+  await nftFileMetadataFile.saveIPFS();
 
- user = await Moralis.User.current();
- console.log(user);
-    const userAddress = user.get('ethAddress');
+  const nftFileMetadataFilePath = nftFileMetadataFile.ipfs();
 
-    switch(createItemStatusField.value){
-        case "0":
-            return;
-        case "1":
-            await ensureMarketplaceIsApproved(nftId, TOKEN_CONTRACT_ADDRESS);
-            await marketplaceContract.methods.addItemToMarket(nftId, TOKEN_CONTRACT_ADDRESS, createItemPriceField.value).send({from: userAddress});
-            break;
-        case "2":
-            alert("Not yet supported!");
-            return;
-    }
+  const nftId = await mintNft(nftFileMetadataFilePath);
+
+  user = await Moralis.User.current();
+  const userAddress = user.get('ethAddress');
+
+  switch(createItemStatusField.value){
+      case "0":
+          return;
+      case "1":
+          await ensureMarketplaceIsApproved(nftId, TOKEN_CONTRACT_ADDRESS);
+          await marketplaceContract.methods.addItemToMarket(nftId, TOKEN_CONTRACT_ADDRESS, createItemPriceField.value).send({from: userAddress });
+          break;
+      case "2":
+          alert("Not yet supported!");
+          return;
+  }
 }
 
 mintNft = async (metadataUrl) => {
@@ -216,10 +187,11 @@ mintNft = async (metadataUrl) => {
 openUserItems = async () => {
   user = await Moralis.User.current();
   if (user){    
-    showElement(userItemsSection);
-    console.log(userItemsSection);
+      $('#userItems').modal('show');
+
+
   }else{
-    login();
+      login();
   }
 }
 
@@ -231,7 +203,7 @@ loadUserItems = async () => {
       getAndRenderItemData(item, renderUserItem);
   });
 }
- 
+
 loadItems = async () => {
   const items = await Moralis.Cloud.run("getItems");
   user = await Moralis.User.current();
@@ -245,8 +217,7 @@ loadItems = async () => {
           }
       }
       getAndRenderItemData(item, renderItem);
-    });
-    // console.log(items);
+  });
 }
 
 initTemplate = (id) => {
@@ -283,12 +254,13 @@ renderUserItem = async (item) => {
   userItems.appendChild(userItem);
 }
 
-
 renderItem = (item) => {
   const itemForSale = marketplaceItemTemplate.cloneNode(true);
+  console.log(marketplaceItemTemplate);
   if (item.sellerAvatar){
       itemForSale.getElementsByTagName("img")[0].src = item.sellerAvatar.url();
       itemForSale.getElementsByTagName("img")[0].alt = item.sellerUsername;
+   
   }
 
   itemForSale.getElementsByTagName("img")[1].src = item.image;
@@ -303,14 +275,15 @@ renderItem = (item) => {
 }
 
 getAndRenderItemData = (item, renderFunction) => {
+  
   fetch(item.tokenUri)
   .then(response => response.json())
   .then(data => {
-    item.name = data.name;
-    item.description = data.description;
-    item.image = data.image;
-    renderFunction(item);
-    })
+      item.name = data.name;
+      item.description = data.description;
+      item.image = data.image;
+      renderFunction(item);
+  })
 }
 
 ensureMarketplaceIsApproved = async (tokenId, tokenAddress) => {
@@ -323,60 +296,57 @@ ensureMarketplaceIsApproved = async (tokenId, tokenAddress) => {
   }
 }
 
-
 buyItem = async (item) => {
   user = await Moralis.User.current();
   if (!user){
       login();
       return;
   } 
-   console.log(item);
   await marketplaceContract.methods.buyItem(item.uid).send({from: user.get('ethAddress'), value: item.askingPrice});
 }
 
 hideElement = (element) => element.style.display = "none";
 showElement = (element) => element.style.display = "block";
 
-//NavBar
+// Navbar
 const userConnectButton = document.getElementById("btnConnect");
 userConnectButton.onclick = login;
 
-const openCreateItemButton = document.getElementById("btnOpenCreateItem");
-openCreateItemButton.onclick = () => showElement(createItemForm);
-
-//User Profile
 const userProfileButton = document.getElementById("btnUserInfo");
 userProfileButton.onclick = openUserInfo;
 
+const openCreateItemButton = document.getElementById("btnOpenCreateItem");
+openCreateItemButton.onclick = () => $('#createItem').modal('show');
+
+//  User profile
 const userInfo = document.getElementById("userInfo");
 const userUsernameField = document.getElementById("txtUsername");
 const userEmailField = document.getElementById("txtEmail");
-const userAvatarImg = document.getElementById("imgAvater");
+const userAvatarImg = document.getElementById("imgAvatar");
 const userAvatarFile = document.getElementById("fileAvatar");
 
 document.getElementById("btnCloseUserInfo").onclick = () => hideElement(userInfo);
+document.getElementById("btnLogout").onclick = logout;
 document.getElementById("btnSaveUserInfo").onclick = saveUserInfo;
-document.getElementById("btnLogout").onclick = logOut;
 
-//Item Creation
+// Item creation
 const createItemForm = document.getElementById("createItem");
 
 const createItemNameField = document.getElementById("txtCreateItemName");
 const createItemDescriptionField = document.getElementById("txtCreateItemDescription");
-const createItemPriceField = document.getElementById("numberCreateItemPrice");
-const createItemStatusField = document.getElementById("selectCreateItemsStatus");
+const createItemPriceField = document.getElementById("numCreateItemPrice");
+const createItemStatusField = document.getElementById("selectCreateItemStatus");
 const createItemFile = document.getElementById("fileCreateItemFile");
-
 document.getElementById("btnCloseCreateItem").onclick = () => hideElement(createItemForm);
 document.getElementById("btnCreateItem").onclick = createItem;
 
-// User Items
-
+// User items
 const userItemsSection = document.getElementById("userItems");
 const userItems = document.getElementById("userItemsList");
 document.getElementById("btnCloseUserItems").onclick = () => hideElement(userItemsSection);
 const openUserItemsButton = document.getElementById("btnMyItems");
 openUserItemsButton.onclick = openUserItems;
+// document.getElementById("btnUserInfo").onclick = () => hideElement(marketplaceItemTemplate);
 
 const userItemTemplate = initTemplate("itemTemplate");
 const marketplaceItemTemplate = initTemplate("marketplaceItemTemplate");

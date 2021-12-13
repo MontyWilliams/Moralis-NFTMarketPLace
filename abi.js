@@ -96,7 +96,7 @@ var tokenContractAbi = [
       },
       {
         "internalType": "address",
-        "name": "creater",
+        "name": "creator",
         "type": "address"
       },
       {
