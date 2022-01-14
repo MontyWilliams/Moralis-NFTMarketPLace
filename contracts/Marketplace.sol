@@ -13,7 +13,7 @@ contract DCX918Market {
         uint256 askingPrice;
         bool isSold;
     }
-
+ 
     AuctionItem[] public itemsForSale;
     mapping (address => mapping (uint256 => bool)) activeItems;
 
@@ -55,7 +55,7 @@ contract DCX918Market {
 
     function buyItem(uint256 id) payable external ItemExists(id) IsForSale(id) HasTransferApproval(itemsForSale[id].tokenAddress,itemsForSale[id].tokenId){
         require(msg.value >= itemsForSale[id].askingPrice, "You aint got enough");
-        require(msg.sender != itemsForSale[id].seller);
+        require(msg.sender != itemsForSale[id].seller); 
 
         itemsForSale[id].isSold = true;
         activeItems[itemsForSale[id].tokenAddress][itemsForSale[id].tokenId] = false;

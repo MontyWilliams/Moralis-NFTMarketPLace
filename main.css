@@ -1,3 +1,4 @@
+
 #background-video {
     width: 100vw;
     height: 100vh;
@@ -17,13 +18,13 @@
     min-height: 100%;
   }
 .bg-moralis{
-    background: #b7e803!important;
+    background: #0307e8!important;
 }
 .text-moralis{
     color: #b7e803!important;
 }
 .border-moralis{
-    border-color: #b7e803!important;
+    border-color: #2d03e8!important;
 }
 .btn-moralis{
     color: #f2f2f2!important;
@@ -97,16 +98,29 @@
     text-align: center;
   }
 
-  .background-video{
+  #background-video{
       z-index: -1000;
   }
 
   .modal-header{
       background: transparent;
   }
+.modal{
+    position: absolute;
+}
 
-  .modal fade{
+.modal fade{
     background: transparent;
+}
+.modal-body2{
+    background: rgba(0, 0, 0, 0.864);
+}
+.modal-body2.row{
+    /* width: fit-content; */
+    align-items: stretch;
+}
+.modal-body2.col{
+    /* width: fit-content; */
 }
 
 .modal-body{
@@ -128,7 +142,27 @@
       -10px 0 80px rgba(255, 0, 255, 0.371),        /* outer left magenta */
       10px 0 80px rgba(0, 255, 255, 0.707);         /* outer right cyan */
   }
-  .card-img-top{
-      
-      
+  #controls{
+      color: lawngreen;
   }
+  img{
+      border-radius: 50%;
+      border: 3px solid black;
+         box-shadow:
+      inset 0 0 50px rgba(255, 255, 255, 0.412),      /* inner white */
+      inset 20px 0 80px rgba(255, 225, 0, 0.2),   /* inner left magenta short */
+      inset -20px 0 80px rgb(226, 242, 242),  /* inner right cyan short */
+      inset 20px 0 300px rgb(7, 5, 5),  /* inner left magenta broad */
+      inset -20px 0 300px rgba(0, 0, 0, 0.857), /* inner right cyan broad */
+      0 0 50px #fff,            /* outer white */
+      -10px 0 80px rgba(255, 0, 255, 0.371),        /* outer left magenta */
+      10px 0 80px rgba(0, 255, 255, 0.707);         /* outer right cyan */
+  
+  }
+ .col{
+     padding: 10px;
+     margin-top: 10px;
+     margin-right: auto;
+     max-width: 90%;
+
+ }
